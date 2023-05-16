@@ -17,6 +17,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.danny.backend.usersapp.auth.TokenJwtConfig.*;
+
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
@@ -34,8 +36,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             user = new ObjectMapper().readValue(request.getInputStream(), User.class); // Lee el body de la peticion y lo convierte en un objeto User
             username = user.getUsername();
             password = user.getPassword();
-            logger.info("Username desde request " + username);
-            logger.info("Password desde request " + password);
+            // Mostrar en consola el username y password
+//            logger.info("Username desde request " + username);
+//            logger.info("Password desde request " + password);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -48,9 +51,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername(); // Obtiene el username del usuario autenticado
 
         // Creacion del token
-        String originalInput = "token_de_prueba." + username;
+        String originalInput = SECRET_KEY + "." + username;
         String token = Base64.getEncoder().encodeToString(originalInput.getBytes()); // Genera un token de prueba
-        response.addHeader("Authorization", "Bearer " + token); // Agrega el token al header de la respuesta
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token); // Agrega el token al header de la respuesta
 
         // body se convertira en un objeto JSON
         Map<String, Object> body = new HashMap<>();
